@@ -1,0 +1,22 @@
+<% if @user.errors.any? %>
+    <%=
+        @emailFlag = false
+        errorMessages = @user.errors.full_messages
+        if (@user.errors.full_messages.include?("Email can't be blank") &&
+                @user.errors.full_messages.include?("Email is invalid"))
+          @emailFlag = true
+          errorMessages.delete("Email is invalid")
+        end
+
+    %>
+    <div id="error_explanation">
+      <div class="alert alert-error">
+        The form contains <%= pluralize(errorMessages.count, "error") %>.
+      </div>
+      <ul>
+        <% errorMessages.each do |msg| %>
+            <li>* <%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+<% end %>
