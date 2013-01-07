@@ -74,6 +74,24 @@ describe "Authentication" do
   describe "authorization" do
 
     #
+    # Exercise 10.5.4
+    #
+    describe "cannot delete another user's microposts" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:wrong_user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: user)
+        FactoryGirl.create(:micropost, user: user)
+
+        valid_signin wrong_user
+        visit user_path(user)
+      end
+
+      it { should_not have_link('delete') }
+
+    end
+
+    #
     # Exercise 9.6.9
     #
     describe "for admins" do
@@ -92,6 +110,19 @@ describe "Authentication" do
 
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
+
+      describe "in the Microposts controller" do
+
+        describe "submitting to the create action" do
+          before { post microposts_path }
+          specify { response.should redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { response.should redirect_to(signin_path) }
+        end
+      end
 
       describe "when attempting to visit a protected page" do
         before do
