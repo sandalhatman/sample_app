@@ -14,8 +14,8 @@ describe "Static pages" do
     describe "for signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
       before do
-        @post1 = FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
-        @post2 = FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        @post1 = FactoryGirl.create(:micropost, user: user, content: "Lorem")
+        @post2 = FactoryGirl.create(:micropost, user: user, content: "Ipsum")
         valid_signin user
         visit root_path
       end
@@ -61,6 +61,35 @@ describe "Static pages" do
         end
 
       end
+
+      it "should render the user's feed" do
+        user.feed.each do |item|
+          page.should have_selector("li##{item.id}", text: item.content)
+        end
+      end
+
+      describe "follower/following counts" do
+        let(:other_user) { FactoryGirl.create(:user) }
+        before do
+          other_user.follow!(user)
+          visit root_path
+        end
+
+        it { should have_link("0 following", href: following_user_path(user)) }
+        it { should have_link("1 followers", href: followers_user_path(user)) }
+      end
+
+
+
+
+
+
+
+
+
+
+
+
 
     end
   end
